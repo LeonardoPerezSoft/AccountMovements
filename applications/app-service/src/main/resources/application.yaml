@@ -1,0 +1,73 @@
+server:
+  port: 8081
+spring:
+  r2dbc:
+    username: "postgres"
+    password: "postgres"
+    url: "r2dbc:postgresql://localhost:5432/AccountMovements"
+    initialization-mode: "always"
+    properties:
+      sslMode: "DISABLE"
+      pool:
+        enabled: true
+        initial-size: 22
+        max-size: 30
+        max-idle-time: "5m"
+  application:
+    name: "AccountMovements"
+  devtools:
+    add-properties: false
+profiles:
+  include: null
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/AccountMovements"
+    username: "postgres"
+    password: "postgres"
+  jpa:
+    hibernate:
+      ddl-auto: "create"
+    show-sql: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+logging:
+  level:
+    io.r2dbc.postgresql.QUERY: "DEBUG"
+    io.r2dbc.postgresql.PARAM: "DEBUG"
+    org.springframework.r2dbc: "DEBUG"
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+adapter:
+  restconsumer:
+    timeout: 5000
+    url: "http://localhost:8082/api"
+resilience4j:
+  circuitbreaker:
+    instances:
+      testGet:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"
+      testPost:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: "2s"
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: "10s"
